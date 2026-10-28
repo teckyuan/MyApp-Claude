@@ -1,0 +1,18 @@
+<div class="card">
+  <h1>Profile</h1>
+  @if (error()) {
+    <div class="alert" role="alert">{{ error() }}</div>
+  }
+  @if (me(); as m) {
+    <dl>
+      <dt class="muted">User id</dt>
+      <dd>{{ m.id }}</dd>
+      <dt class="muted">Email</dt>
+      <dd>{{ m.email }}</dd>
+      <dt class="muted">Role</dt>
+      <dd>{{ m.role }}</dd>
+    </dl>
+  } @else if (!error()) {
+    <p class="muted">Loading…</p>
+  }
+</div>

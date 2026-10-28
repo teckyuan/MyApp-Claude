@@ -1,0 +1,95 @@
+<form [formGroup]="form" (ngSubmit)="save()" class="card">
+  <h1>New invoice</h1>
+
+  @if (errors().length) {
+    <div class="alert" role="alert">
+      <ul>
+        @for (e of errors(); track e) {
+          <li>{{ e }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="details">
+    <mat-form-field class="wide">
+      <mat-label>Bill to</mat-label>
+      <input matInput formControlName="billTo" maxlength="200" autocomplete="off" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Vehicle no</mat-label>
+      <input matInput formControlName="vehicleNo" maxlength="30" required autocomplete="off" />
+      <mat-error>Vehicle no is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Chassis no</mat-label>
+      <input matInput formControlName="chassisNo" maxlength="50" autocomplete="off" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Mileage</mat-label>
+      <input matInput type="number" min="0" step="1" formControlName="mileage" />
+      <mat-error>Enter a mileage of zero or more.</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="date" required />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+      <mat-error>Enter a valid date.</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="lines-wrap">
+    <table class="lines" formArrayName="lines">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th class="num">Qty</th>
+          <th>Unit</th>
+          <th class="num">Unit rate</th>
+          <th class="num">Total</th>
+          <th><span class="visually-hidden">Remove</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of lines.controls; track line; let i = $index) {
+          <tr [formGroupName]="i">
+            <td class="item"><input formControlName="item" aria-label="Item" autocomplete="off" /></td>
+            <td class="desc"><input formControlName="description" aria-label="Description" autocomplete="off" /></td>
+            <td class="num"><input type="number" min="0" step="any" formControlName="qty" aria-label="Quantity" /></td>
+            <td><input formControlName="unit" list="unit-suggestions" aria-label="Unit" autocomplete="off" /></td>
+            <td class="num">
+              <input type="number" min="0" step="0.01" formControlName="unitRate" aria-label="Unit rate" />
+            </td>
+            <td class="num total">{{ lineTotal(i) | currency }}</td>
+            <td>
+              <button type="button" class="danger" (click)="removeLine(i)" [attr.aria-label]="'Remove row ' + (i + 1)">
+                ✕
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5" class="num">Grand total</td>
+          <td class="num total">{{ grandTotal() | currency }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <datalist id="unit-suggestions">
+    @for (u of unitSuggestions; track u) {
+      <option [value]="u"></option>
+    }
+  </datalist>
+
+  <div class="row between" style="margin-top: 16px">
+    <button mat-stroked-button type="button" (click)="addLine()">Add row</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : 'Save invoice' }}
+    </button>
+  </div>
+</form>

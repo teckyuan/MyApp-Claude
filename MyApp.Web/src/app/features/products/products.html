@@ -1,0 +1,71 @@
+<div class="card">
+  <div class="row between">
+    <h1>Products</h1>
+    <button mat-flat-button type="button" (click)="openDialog()">New product</button>
+  </div>
+
+  @if (errors().length) {
+    <div class="alert" role="alert">
+      <ul>
+        @for (e of errors(); track e) {
+          <li>{{ e }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (result(); as r) {
+    @if (r.items.length === 0) {
+      <p class="muted">No products yet.</p>
+    } @else {
+      <table mat-table [dataSource]="r.items" [trackBy]="trackById">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Id</th>
+          <td mat-cell *matCellDef="let p">{{ p.id }}</td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let p">{{ p.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef class="num">Price</th>
+          <td mat-cell *matCellDef="let p" class="num">{{ p.price | currency }}</td>
+        </ng-container>
+        <ng-container matColumnDef="created">
+          <th mat-header-cell *matHeaderCellDef>Created</th>
+          <td mat-cell *matCellDef="let p">{{ p.createdAtUtc | date: 'medium' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="updated">
+          <th mat-header-cell *matHeaderCellDef>Updated</th>
+          <td mat-cell *matCellDef="let p">{{ p.updatedAtUtc ? (p.updatedAtUtc | date: 'medium') : '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let p" class="actions">
+            <button mat-button type="button" (click)="openDialog(p)">Edit</button>
+            @if (auth.isAdmin()) {
+              <button mat-button type="button" class="danger" (click)="remove(p)">Delete</button>
+            }
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: columns"
+          class="clickable"
+          title="Double-click to edit"
+          (dblclick)="onRowDblClick($event, row)"
+        ></tr>
+      </table>
+    }
+    <mat-paginator
+      [length]="r.totalCount"
+      [pageIndex]="r.page - 1"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="pageSizes"
+      (page)="onPage($event)"
+    />
+  } @else if (!errors().length) {
+    <p class="muted">Loading…</p>
+  }
+</div>

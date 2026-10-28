@@ -1,0 +1,16 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.log
+TestResults/
+coverage/
+*.DotSettings.user
+
+## Secrets / local config
+appsettings.Local.json
+*.pfx
+.env
